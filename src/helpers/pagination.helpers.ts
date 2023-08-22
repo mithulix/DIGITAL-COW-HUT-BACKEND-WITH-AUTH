@@ -1,4 +1,4 @@
-import { IOption, IPaginationOptions } from './pagination.interface';
+import { IOption, IPaginationOptions } from '../shared/pagination/pagination.interface';
 
 const paginationAndSortFields  = (
   options: IPaginationOptions

@@ -6,12 +6,10 @@ import { CowValidationSchema } from './cow.validation';
 const cowRouter = express.Router();
 
 cowRouter.post(
-  '/',
+  '/create-cow',
   validateZodRequest(CowValidationSchema.createCowZodValidateSchema),
   CowController.createCow,
 );
-
-cowRouter.get('/', CowController.getAllCows);
 
 cowRouter.patch(
   '/:id',
@@ -22,5 +20,7 @@ cowRouter.patch(
 cowRouter.get('/:id', CowController.getSingleCow);
 
 cowRouter.delete('/:id', CowController.deleteCow);
+
+cowRouter.get('/', CowController.getAllCows);
 
 export const CowRouter = cowRouter;

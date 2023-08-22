@@ -5,10 +5,12 @@ import ApiError from '../../shared/errors/ApiError';
 import { ErrorHandlers } from '../../shared/errors/error.handlers';
 import { IGenericErrorMessage } from '../../shared/errors/typeError';
 
-const globalErrorHandlers: ErrorRequestHandler = (error, req, res, next) => {
+const globalErrorHandlers: ErrorRequestHandler = (error, req, res) => {
   config.env === 'development'
-    ? console.log(`🐱‍🏍 globalErrorHandler ~~`, { error })
-    : console.log(`🐱‍🏍 globalErrorHandler ~~`, error);
+    ? console.log(`🐱‍🏍 globalErrorHandler ~~`, error)
+    : console.log(
+        `🐱‍🏍 globalErrorHandler ~~, ${JSON.stringify(error)}`,
+      );
 
   let statusCode = 500;
   let message = 'Something went wrong !';
@@ -41,15 +43,13 @@ const globalErrorHandlers: ErrorRequestHandler = (error, req, res, next) => {
         ]
       : [];
   } else if (error instanceof Error) {
-    message = error?.message;
-    errorMessages = error?.message
-      ? [
-          {
-            path: '',
-            message: error?.message,
-          },
-        ]
-      : [];
+    message = error.message;
+    errorMessages = [
+      {
+        path: '',
+        message: error?.message,
+      },
+    ];
   }
 
   res.status(statusCode).json({
@@ -58,7 +58,6 @@ const globalErrorHandlers: ErrorRequestHandler = (error, req, res, next) => {
     errorMessages,
     stack: config.env !== 'production' ? error?.stack : undefined,
   });
-  next();
 };
 
 export default globalErrorHandlers;

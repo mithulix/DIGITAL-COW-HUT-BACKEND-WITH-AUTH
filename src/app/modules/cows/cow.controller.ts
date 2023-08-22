@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from 'express';
 import httpStatus from 'http-status';
-import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
+import { sendResponse } from '../../../shared/logger&sendResponse/sendResponse';
 import { paginationFields} from '../../../shared/pagination/pagination.fields';
 import { pick } from '../../../shared/pagination/pick';
 import { catchAsync } from '../../middlewares/catchAsync';

@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import { SortOrder } from 'mongoose';
 import ApiError from '../../../shared/errors/ApiError';
-import { PaginationHelpers } from '../../../shared/pagination/pagination.helpers';
+import { PaginationHelpers } from '../../../helpers/pagination.helpers';
 import { IPaginationOptions } from '../../../shared/pagination/pagination.interface';
 import { User } from '../users/user.model';
 import { cowSearchableFields } from './cow.constant';
