@@ -1,6 +1,8 @@
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import httpStatus from "http-status";
+import globalErrorHandlers from "./app/middlewares/globalErrorHandlers";
+import appRouter from "./app/routes/routes";
 
 const app: Application = express();
 
@@ -18,7 +20,7 @@ app.get('/api/c1', async (req:Request, res:Response) => {
 app.use('/api/c1', appRouter);
 
 // middleware
-app.use(errorHandling);
+app.use(globalErrorHandlers);
 
 
 //if not found Routes

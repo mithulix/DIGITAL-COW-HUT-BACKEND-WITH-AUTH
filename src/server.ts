@@ -1,22 +1,23 @@
 import { Server } from "http";
-import { mongo } from "mongoose";
-import config from "./config/config";
+import mongoose from "mongoose";
+import app from "./app";
+import config from "./config/envConfig";
 
 let server:Server;
 
 const closeServer = () => {
-    if (server){
-        Server.close(() => {
+    if (server) {
+        server.close(() => {
             process.exit(1);
-        })
-    }else{
+        });
+    } else {
         process.exit(0);
     }
 };
 
 async function mongoConnect() {
     try {
-        await mongo.connect(config.database_url as string);
+        await mongoose.connect(config.database_url as string);
         console.log('Connected to database');
         
         server = app.listen(config.port, () => {

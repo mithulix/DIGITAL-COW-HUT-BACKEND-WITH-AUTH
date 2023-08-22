@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import ApiError from '../../../errors/apiErrors';
+import ApiError from '../../../errors/ApiError';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
@@ -43,10 +42,10 @@ const updateUser = async (
     });
   }
 
-  const savedUser = await User.findOneAndUpdate({ _id: id }, updatedUserData, {
+  const result = await User.findOneAndUpdate({ _id: id }, updatedUserData, {
     new: true,
   });
-  return savedUser;
+  return result;
 };
 
 //------delete a single user service --------------------------------
