@@ -11,13 +11,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //main route for the application
-app.get('/api/c1', async (req:Request, res:Response) => {
+app.get('/api/v1', async (req:Request, res:Response) => {
     res.send('Welcome to Cow hut, connected the server throw_ api ')
 });
 
 
 //routes
-app.use('/api/c1', appRouter);
+app.use('/api/v1', appRouter);
 
 // middleware
 app.use(globalErrorHandlers);

@@ -1,7 +1,7 @@
 import { RequestHandler, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { catchAsync } from '../../middlewares/catchAsync';
-import sendResponse from '../../../shared/sendResponse';
+import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
 import { UserService } from './user.service';
 
 //------create a new User controller --------------------------------

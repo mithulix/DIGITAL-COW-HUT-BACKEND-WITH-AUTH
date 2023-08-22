@@ -18,13 +18,13 @@ const closeServer = () => {
 async function mongoConnect() {
     try {
         await mongoose.connect(config.database_url as string);
-        console.log('Connected to database');
+        console.log('🐳 Database connection established');
         
         server = app.listen(config.port, () => {
-            console.log(`Application listening on port ${config.port}`);
+            console.log(`😎 Application listening on port: ${config.port}`);
         });
     } catch (error) {
-        console.log(`Failed to listen on port ${config.port}`, error);
+        console.log(`😭 Failed to listen on port ${config.port}`, error);
     };
 
     process.on('UnhandledRejection', async function(error) {

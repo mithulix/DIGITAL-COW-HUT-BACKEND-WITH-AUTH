@@ -1,25 +1,24 @@
-import express, { Router } from 'express';
+import express from 'express';
+import { CowRouter } from '../modules/cows/cow.router';
 import { UserRouter } from "../modules/users/user.route";
 
 const appRouter = express.Router();
 
-const routes = [
+const moduleRoutes = [
     {
         path: '/users',
         router: UserRouter,
     },
     {
         path:'/cows',
-        router: CowsRouter,
+        router: CowRouter,
     },
-    {
-        path:'/orders',
-        router: OrderRouter,
-    }
+    // {
+    //     path:'/orders',
+    //     router: OrderRouter,
+    // }
 ];
 
-routes.forEach((el: { path: string; route: Router }) =>
-  appRouter.use(el.path, el.route)
-);
+moduleRoutes.forEach(route => appRouter.use(route.path, route.router)); 
 
 export default appRouter;
