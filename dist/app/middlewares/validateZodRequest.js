@@ -9,13 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateZodRequest = void 0;
-const validateZodRequest = (schema) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const validateZodRequest = (zodSchema) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield schema.parseAsync({
+        yield zodSchema.parseAsync({
             body: req.body,
-            params: req.params,
             query: req.query,
+            params: req.params,
             cookies: req.cookies,
         });
         next();
@@ -24,4 +23,4 @@ const validateZodRequest = (schema) => (req, res, next) => __awaiter(void 0, voi
         next(error);
     }
 });
-exports.validateZodRequest = validateZodRequest;
+exports.default = validateZodRequest;
