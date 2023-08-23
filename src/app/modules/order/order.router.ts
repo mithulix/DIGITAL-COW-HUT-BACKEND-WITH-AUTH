@@ -6,7 +6,7 @@ import { OrderValidationSchema } from './order.validation';
 const orderRouter = express.Router();
 
 orderRouter.post(
-  '/create-order',
+  '/',
   validateZodRequest(OrderValidationSchema.createOrderZodValidateSchema),
   OrderController.createOrder
 );
@@ -15,4 +15,4 @@ orderRouter.get('/:id', OrderController.getSingleOrder);
 
 orderRouter.get('/', OrderController.getAllOrders);
 
-export const OrderRouter = orderRouter;
+export const OrderRoutes = orderRouter;

@@ -1,95 +1,83 @@
-import { Request, Response, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import httpStatus from 'http-status';
 import { sendResponse } from '../../../shared/logger&sendResponse/sendResponse';
-import { paginationFields} from '../../../shared/pagination/pagination.fields';
+import { paginationFields } from '../../../shared/pagination/pagination.fields';
 import { pick } from '../../../shared/pagination/pick';
 import { catchAsync } from '../../middlewares/catchAsync';
-import { cowFilterOptions } from './cow.constant';
+import { cowSearchFilterOptions } from './cow.constant';
+import { ICow } from './cow.interface';
 import { CowService } from './cow.service';
 
 //-------create a cow controller---------------------------------
-const createCow: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const user = req.body;
+const createCow: RequestHandler = catchAsync(async (req, res) => {
+  const cowData = req.body;
+  const result = await CowService.createCow(cowData);
 
-    const result = await CowService.createCow(user);
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: 'Cow created successfully',
-      data: result,
-    });
-  },
-);
+  sendResponse<ICow>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cow data created Successfully!',
+    data: result,
+  });
+});
 
 //-------update a cow controller---------------------------------
-const updateCow: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const user = req.body;
+const updateCow: RequestHandler = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const cowData = req.body;
+  const result = await CowService.updateCow(id, cowData);
 
-    const result = await CowService.updateCow(user, id);
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: result ? 'Cow updated successfully' : 'Cow not found',
-      data: result,
-    });
-  },
-);
+  sendResponse<ICow>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cow data Updated Successfully!',
+    data: result,
+  });
+});
 
 //-------get all cows controller---------------------------------
-const getAllCows: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const filters = pick(req.query, cowFilterOptions);
+const getAllCows: RequestHandler = catchAsync(async (req, res) => {
+  const paginationOptions = pick(req.query, paginationFields);
+  const searchFilterFields = pick(req.query, cowSearchFilterOptions);
+  const result = await CowService.getAllCows(
+    paginationOptions,
+    searchFilterFields,
+  );
 
-    const paginationOption = pick(req.query, paginationFields);
-
-    const result = await CowService.getAllCows(filters, paginationOption);
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: result ? 'Cows retrieved successfully' : 'Cow not found',
-      meta: result?.meta,
-      data: result.data,
-    });
-  },
-);
+  sendResponse<ICow[]>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cows data Retrieved Successfully!',
+    meta: result?.meta,
+    data: result?.data,
+  });
+});
 
 //-------get a single cow controller---------------------------------
-const getSingleCow: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+const getSingleCow: RequestHandler = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await CowService.getSingleCow(id);
 
-    const result = await CowService.getSingleCow(id);
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: result ? 'Cow retrieved successfully' : 'Cow not found',
-      data: result,
-    });
-  },
-);
+  sendResponse<ICow>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cow data Retrieved Successfully!',
+    data: result,
+  });
+});
 
 //-------delete a cow controller---------------------------------
-const deleteCow: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+const deleteCow: RequestHandler = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await CowService.deleteCow(id);
 
-    const deletedCow = await CowService.deleteCow(id);
-
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: deletedCow ? 'Cow deleted successfully' : 'Cow not found',
-      data: deletedCow,
-    });
-  },
-);
+  sendResponse<ICow>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cow data Deleted Successfully!',
+    data: result,
+  });
+});
 
 export const CowController = {
   createCow,

@@ -35,7 +35,7 @@ const updateZodValidateSchema = z.object({
   }),
 });
 
-export const UserValidation = {
+export const UserValidationSchema = {
   createUserZodValidateSchema,
   updateZodValidateSchema,
 };
