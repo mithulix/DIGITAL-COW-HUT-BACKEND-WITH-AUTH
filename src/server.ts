@@ -1,41 +1,30 @@
-import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import config from "./config/envConfig";
+const port = config.PORT;
 
-let server:Server;
+// Connect Database
+mongoose
+  .connect(config.DATABASE_URL as string)
+  .then(() => console.log("😂 Database connected successfully"))
+  .catch((error) => console.log(`Unable to connect MongoDB: ${error}`));
 
-const closeServer = () => {
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    } else {
-        process.exit(0);
-    }
-};
-
-async function mongoConnect() {
-    try {
-        await mongoose.connect(config.database_url as string);
-        console.log('🐳 Database connection established');
-        
-        server = app.listen(config.port, () => {
-            console.log(`😎 Application listening on port: ${config.port}`);
-        });
-    } catch (error) {
-        console.log(`😭 Failed to listen on port ${config.port}`, error);
-    };
-
-    process.on('UnhandledRejection', async function(error) {
-        console.log(`Unhandled rejection ${error}`);
-        closeServer();
-    })
-};
-
-mongoConnect();
-
-process.on(`SIGTERM`, () =>{
-    console.log('SIGTERM received from server');
-    closeServer();
+// Listen to Server
+const server = app.listen(port, () => {
+  console.log(`🐳 Server is running on port ${port}`);
 });
+
+
+// Unhandled Rejection: Gracefully off the server
+process.on("unhandledRejection", (error) => {
+  console.log(`Unhandled rejection : ${error}`);
+
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
+

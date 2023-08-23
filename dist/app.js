@@ -22,11 +22,11 @@ app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 //main route for the application
-app.get('/api/c1', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get('/api/v1', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send('Welcome to Cow hut, connected the server throw_ api ');
 }));
 //routes
-app.use('/api/c1', routes_1.default);
+app.use('/api/v1', routes_1.default);
 // middleware
 app.use(globalErrorHandlers_1.default);
 //if not found Routes

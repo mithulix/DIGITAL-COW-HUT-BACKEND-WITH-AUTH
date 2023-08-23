@@ -1,25 +1,15 @@
 import { Response } from 'express';
+import { IApiResponse } from '../interfaces/common.interface';
 
-type IApiResponse<T> = {
-  statusCode: number;
-  success: boolean;
-  message?: string | null;
-  meta?: {
-    page: number;
-    limit: number;
-    total: number;
+const sendResponse = <T>(res: Response, responseData: IApiResponse<T>) => {
+  const response: IApiResponse<T> = {
+    statusCode: responseData.statusCode,
+    success: responseData.success,
+    message: responseData.message,
+    meta: responseData.meta,
+    data: responseData.data,
   };
-  data?: T | null;
+  res.status(responseData.statusCode).json(response);
 };
 
-export const sendResponse = <T>(res: Response, data: IApiResponse<T>): void => {
-  const responseData: IApiResponse<T> = {
-    success: true,
-    statusCode: data.statusCode,
-    message: data.message || null,
-    meta: data.meta || null || undefined,
-    data: data.data || null || undefined,
-  };
-
-  res.status(data.statusCode).json(responseData);
-};
+export default sendResponse;

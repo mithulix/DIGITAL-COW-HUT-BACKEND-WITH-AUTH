@@ -25,33 +25,74 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
+const common_1 = require("../../../enum/common");
+const pagination_helpers_1 = require("../../../helpers/pagination.helpers");
+const ApiError_1 = __importDefault(require("../../../shared/errors/ApiError"));
+const user_constant_1 = require("./user.constant");
 const user_model_1 = require("./user.model");
-//------create a new User service --------------------------------
-const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    user.budget = (_a = user.budget) !== null && _a !== void 0 ? _a : 0;
-    user.income = (_b = user.income) !== null && _b !== void 0 ? _b : 0;
-    const savedUser = yield user_model_1.User.create(user);
-    return savedUser;
+const user_utils_1 = require("./user.utils");
+//------signUp / create a new User service --------------------------------
+const signUp = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    if (payload.role == common_1.USER_ENUM.BUYER) {
+        if (!payload.budget) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Budget not specified !');
+        }
+        if (payload.budget < 15000) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Budget must be at least more than 15000');
+        }
+    }
+    if (payload.role == common_1.USER_ENUM.SELLER)
+        payload.income = 0;
+    const data = yield user_model_1.User.create(payload);
+    return data;
 });
 //------Get all user service --------------------------------
-const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const allUsers = yield user_model_1.User.find();
-    return allUsers;
+const getAllUsers = (paginationOptions, searchFilterFields) => __awaiter(void 0, void 0, void 0, function* () {
+    // Pagination
+    const { page, limit, skip, sortBy, sortOrder } = (0, pagination_helpers_1.PaginationHelpers)(paginationOptions);
+    // Sort Condition
+    const sortCondition = { [sortBy]: sortOrder };
+    const { searchTerm } = searchFilterFields, filterData = __rest(searchFilterFields, ["searchTerm"]);
+    const andCondition = [];
+    // Search Condition
+    if (searchTerm) {
+        andCondition.push({
+            $or: user_constant_1.userSearchFields.map(field => ({
+                [field]: { $regex: searchTerm, $options: 'i' },
+            })),
+        });
+    }
+    // Filter Fields
+    if (Object.keys(filterData).length) {
+        andCondition.push({
+            $and: Object.entries(filterData).map(([field, value]) => ({
+                [field]: [value],
+            })),
+        });
+    }
+    const whereCondition = andCondition.length ? { $and: andCondition } : {};
+    const data = yield user_model_1.User.find(whereCondition)
+        .sort(sortCondition)
+        .skip(skip)
+        .limit(limit);
+    const total = yield user_model_1.User.countDocuments();
+    const meta = { page, limit, total };
+    return { meta, data };
 });
 //------get a single user service --------------------------------
 const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!(yield (0, user_utils_1.isUserAvailable)(id))) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not Found!');
+    }
     const singleUser = yield user_model_1.User.findById(id);
     return singleUser;
 });
 //------ update a User service --------------------------------
-const updateUser = (user, id) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExist = yield user_model_1.User.findById(id);
-    if (!isExist) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found in the database');
+const updateUser = (_id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!(yield (0, user_utils_1.isUserAvailable)(_id))) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found in the Database !');
     }
-    const { name } = user, userData = __rest(user, ["name"]);
+    const { name } = payload, userData = __rest(payload, ["name"]);
     const updatedUserData = Object.assign({}, userData);
     if (name && Object.keys(name).length > 0) {
         Object.keys(name).forEach(key => {
@@ -59,18 +100,21 @@ const updateUser = (user, id) => __awaiter(void 0, void 0, void 0, function* () 
             updatedUserData[keyName] = name[key];
         });
     }
-    const result = yield user_model_1.User.findOneAndUpdate({ _id: id }, updatedUserData, {
+    const result = yield user_model_1.User.findOneAndUpdate({ _id }, updatedUserData, {
         new: true,
     });
     return result;
 });
 //------delete a single user service --------------------------------
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!(yield (0, user_utils_1.isUserAvailable)(id))) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found in the Database !');
+    }
     const deletedUser = yield user_model_1.User.findByIdAndDelete(id);
     return deletedUser;
 });
 exports.UserService = {
-    createUser,
+    signUp,
     updateUser,
     getAllUsers,
     getSingleUser,

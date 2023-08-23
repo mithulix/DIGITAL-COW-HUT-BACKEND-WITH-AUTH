@@ -1,65 +1,47 @@
-import mongoose from 'mongoose';
-import { ZodError, ZodIssue } from "zod";
-import { IGenericErrorMessage, IGenericErrorResponse } from './typeError';
-import httpStatus from 'http-status';
-
+import { ZodError } from "zod";
+import { Error } from "mongoose";
+import { IErrorMessage, IErrorResponse } from "./typeError";
 
 //----handle Validation Error --------------------------------
 const handleValidationError = (
-  err: mongoose.Error.ValidationError,
-): IGenericErrorResponse => {
-  const errors: IGenericErrorMessage[] = Object.values(err.errors).map(
-    (el: mongoose.Error.ValidatorError | mongoose.Error.CastError) => {
-      return {
-        path: el?.path,
-        message: el?.message,
-      };
-    },
+  error: Error.ValidationError,
+): IErrorResponse => {
+  const errorMessage: IErrorMessage[] = Object.values(error.errors).map(
+    error => ({ path: error.path, message: error.message }),
   );
-  const statusCode = 400;
-  return {
-    statusCode,
-    message: 'validation error',
-    errorMessages: errors,
-  };
+
+  const status = 400;
+  const message = error.message;
+  return { status, message, errorMessage };
 };
 
 //----handle Zod Error --------------------------------
-const handleZodError = (error: ZodError) => {
-    const errors: IGenericErrorMessage[] = error.issues.map((issue: ZodIssue) => {
-        return {
-            path: issue?.path[issue.path.length - 1],
-            message: issue?.message,
-        };
-    });
+const handleZodError = (error: ZodError): IErrorResponse => {
+  const errorMessage: IErrorMessage[] = error.issues.map(issue => ({
+    path: issue.path[issue.path.length - 1],
+    message: issue.message,
+  }));
 
-    const statusCode = 400;
+  const status = 400;
+  const message = 'Validation Error';
 
-    return {
-        statusCode,
-        message: "Zod error",
-        errorMessages: errors,
-    }
+  return { status, message, errorMessage };
 };
 
 //----handle Cast Error --------------------------------
-const handleCastError = (error: mongoose.Error.CastError) => {
-    const errors = [
-        {
-            path:error.path,
-            message: error.message
-        }
-    ];
+const handleCastError = (error: Error.CastError): IErrorResponse => {
+  const errorMessage: IErrorMessage[] = [
+    { path: error.path, message: error.message },
+  ];
 
-    return {
-        statusCode: httpStatus.BAD_REQUEST,
-        message: 'Validation failed',
-        errorMessages: errors,
-    }
+  const status = 400;
+  const message = 'Invalid ID';
+
+  return { status, message, errorMessage };
 };
 
-export const ErrorHandlers = {
-    handleValidationError,
-    handleZodError,
-    handleCastError
+export const ErrorHandler = {
+  handleValidationError,
+  handleZodError,
+  handleCastError,
 };

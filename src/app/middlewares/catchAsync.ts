@@ -1,11 +1,14 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, Response } from 'express';
+import { RequestHandler } from 'express-serve-static-core';
 
-export const catchAsync = (fn: RequestHandler) => {
-    return async (req: Request, res: Response, next: NextFunction):Promise<void> => {
-        try {
-            await fn(req, res, next);
-        }catch(error) {
-            next(error);
-        };
+const catchAsync =
+  (fn: RequestHandler) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
     }
-};
+  };
+
+export default catchAsync;

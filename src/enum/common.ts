@@ -1,5 +1,4 @@
 export enum USER_ENUM {
-    BUYER = "buyer",
-    SELLER = "seller",
-  }
-  
+  BUYER = 'buyer',
+  SELLER = 'seller',
+}

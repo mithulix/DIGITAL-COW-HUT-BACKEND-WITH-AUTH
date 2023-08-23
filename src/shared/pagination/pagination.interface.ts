@@ -1,12 +1,4 @@
-export type IOption = {
-  page: number;
-  limit: number;
-  skip: number;
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-};
-
-export type IPaginationOptions = {
+export type IPagination = {
   page?: number;
   limit?: number;
   sortBy?: string;

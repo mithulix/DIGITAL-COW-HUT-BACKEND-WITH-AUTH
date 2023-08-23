@@ -1,6 +1,4 @@
-import { IGenericErrorMessage } from '../errors/typeError';
-
-export type IGenericResponse<T> = {
+export type IAllDataType<T> = {
   meta: {
     page: number;
     limit: number;
@@ -9,8 +7,15 @@ export type IGenericResponse<T> = {
   data: T;
 };
 
-export type IGenericErrorResponse = {
+
+export type IApiResponse<T> = {
   statusCode: number;
+  success: boolean;
   message: string;
-  errorMessages: IGenericErrorMessage[];
+  meta?: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+  data?: T | null;
 };

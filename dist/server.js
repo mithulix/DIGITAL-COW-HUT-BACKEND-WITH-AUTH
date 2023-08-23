@@ -15,41 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
 const envConfig_1 = __importDefault(require("./config/envConfig"));
+process.on('uncaughtException', error => {
+    console.log(error);
+    process.exit(1);
+});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let server;
-const closeServer = () => {
-    if (server) {
-        server.close(() => {
-            process.exit(1);
-        });
-    }
-    else {
-        process.exit(0);
-    }
-};
-function mongoConnect() {
+function mongoDBconnect() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(envConfig_1.default.database_url);
-            console.log('Connected to database');
+            console.log(`😂 database is connected successfully..`);
             server = app_1.default.listen(envConfig_1.default.port, () => {
-                console.log(`Application listening on port ${envConfig_1.default.port}`);
+                console.log(`👽 Application listening on port: ${envConfig_1.default.port}`);
             });
         }
         catch (error) {
-            console.log(`Failed to listen on port ${envConfig_1.default.port}`, error);
+            console.log(`😥 failed to connect database.`, error);
         }
-        ;
-        process.on('UnhandledRejection', function (error) {
-            return __awaiter(this, void 0, void 0, function* () {
-                console.log(`Unhandled rejection ${error}`);
-                closeServer();
-            });
-        });
     });
 }
-;
-mongoConnect();
-process.on(`SIGTERM`, () => {
-    console.log('SIGTERM received from server');
-    closeServer();
-});
+mongoDBconnect();
