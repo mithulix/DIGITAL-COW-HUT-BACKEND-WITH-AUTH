@@ -1,44 +1,44 @@
-import { Schema, model } from 'mongoose';
-import { IUser, UserModel, userRoles } from './user.interface';
+import { Schema, model } from "mongoose";
+import { IUser, UserModel } from "./user.interface";
+import { userRole } from "./user.constant";
 
 const userSchema = new Schema<IUser>(
   {
-    phoneNumber: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    role: {
-      type: String,
-      enum: userRoles,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
     name: {
       firstName: {
         type: String,
         required: true,
+        trim: true,
       },
       lastName: {
         type: String,
         required: true,
+        trim: true,
       },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      enum: userRole,
+      trim: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      trim: true,
     },
     address: {
       type: String,
       required: true,
+      trim: true,
     },
-    budget: {
-      type: Number,
-      required: true,
-    },
-    income: {
-      type: Number,
-      required: true,
-    },
+    budget: Number,
+    income: Number,
   },
   {
     timestamps: true,
@@ -48,4 +48,4 @@ const userSchema = new Schema<IUser>(
   },
 );
 
-export const User = model<IUser, UserModel>('User', userSchema);
+export const User = model<IUser, UserModel>("User", userSchema);

@@ -1,28 +1,18 @@
 import { z } from 'zod';
-import { userRoles } from './user.interface';
+import { userRole } from './user.constant';
 
 const createUserZodValidateSchema = z.object({
   body: z.object({
-    phoneNumber: z.string({
-      required_error: 'phoneNumber is required',
-    }),
-    role: z.enum([...userRoles] as [string, ...string[]], {
-      required_error: 'role is required',
-    }),
-    password: z.string({
-      required_error: 'password is required',
-    }),
     name: z.object({
-      firstName: z.string({
-        required_error: 'firstName is required',
-      }),
-      lastName: z.string({
-        required_error: 'lastName is required',
-      }),
+      firstName: z.string(),
+      lastName: z.string(),
     }),
-    address: z.string({
-      required_error: 'address is required',
+    role: z.enum([...userRole] as [string, ...string[]], {
+      required_error: 'Role is required',
     }),
+    password: z.string({ required_error: 'Password is required!' }),
+    phoneNumber: z.string({ required_error: 'Phone number is required!' }),
+    address: z.string({ required_error: 'Address is required!' }),
     budget: z.number().optional(),
     income: z.number().optional(),
   }),
@@ -30,22 +20,22 @@ const createUserZodValidateSchema = z.object({
 
 const updateZodValidateSchema = z.object({
   body: z.object({
-    phoneNumber: z.string().optional(),
-    role: z.enum([...userRoles] as [string, ...string[]]).optional(),
-    password: z.string().optional(),
     name: z
       .object({
         firstName: z.string().optional(),
         lastName: z.string().optional(),
       })
       .optional(),
+    role: z.enum([...userRole] as [string, ...string[]], {}).optional(),
+    password: z.string().optional(),
+    phoneNumber: z.string().optional(),
     address: z.string().optional(),
     budget: z.number().optional(),
     income: z.number().optional(),
   }),
 });
 
-export const UserValidationSchema = {
+export const UserValidation = {
   createUserZodValidateSchema,
   updateZodValidateSchema,
 };

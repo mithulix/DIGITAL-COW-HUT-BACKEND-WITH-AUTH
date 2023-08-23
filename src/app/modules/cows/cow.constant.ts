@@ -1,33 +1,37 @@
-export const cowLocations = [
-  'Dhaka',
-  'Chattogram',
-  'Barishal',
-  'Rajshahi',
-  'Sylhet',
-  'Comilla',
-  'Rangpur',
-  'Mymensingh',
+export const cowLocation = [
+  "Dhaka",
+  "Chattogram",
+  "Barishal",
+  "Rajshahi",
+  "Sylhet",
+  "Comilla",
+  "Rangpur",
+  "Mymensingh",
 ];
 
-export const cowBreeds = [
-  'Brahman',
-  'Nellore',
-  'Sahiwal',
-  'Gir',
-  'Indigenous',
-  'Tharparkar',
-  'Kankrej',
+export const cowBreed = [
+  "Brahman",
+  "Nellore",
+  "Sahiwal",
+  "Gir",
+  "Indigenous",
+  "Tharparkar",
+  "Kankrej",
 ];
 
-export const cowLabels = ['for sale', 'sold out'];
+export const cowLabel = ["sale", "sold out"];
 
-export const cowCategories = ['Dairy', 'Beef', 'Dual Purpose'];
+export const cowCategory = ["Dairy", "Beef", "Dual Purpose"];
 
-export const cowSearchableFields = ['location', 'breed', 'category'];
-
-export const cowFilterOptions = [
-  'searchTerm',
-  'minPrice',
-  'maxPrice',
-  'location',
+export const cowSearchFilterOptions = [
+  "searchTerm",
+  "name",
+  "breed",
+  "location",
+  "minPrice",
+  "maxPrice",
+  "category",
+  "label",
 ];
+
+export const cowSearchFields = ["name", "breed"];

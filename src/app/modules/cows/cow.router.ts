@@ -23,4 +23,4 @@ cowRouter.delete('/:id', CowController.deleteCow);
 
 cowRouter.get('/', CowController.getAllCows);
 
-export const CowRouter = cowRouter;
+export const CowRoutes = cowRouter;

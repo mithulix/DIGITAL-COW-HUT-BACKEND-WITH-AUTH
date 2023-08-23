@@ -1,13 +1,14 @@
-import { IOption, IPaginationOptions } from '../shared/pagination/pagination.interface';
+import {
+  IOption,
+  IPaginationOptions,
+} from '../shared/pagination/pagination.interface';
 
-const paginationAndSortFields  = (
-  options: IPaginationOptions
-): IOption => {
+export const PaginationHelpers = (options: IPaginationOptions): IOption => {
   const page = Number(options?.page || 1);
   const limit = Number(options?.limit || 10);
   const skip = (page - 1) * limit;
   const sortBy = options?.sortBy || 'createdAt';
-  const sortOrder = options?.sortOrder || 'desc';
+  const sortOrder = options?.sortOrder || 'asc';
 
   return {
     page,
@@ -17,7 +18,3 @@ const paginationAndSortFields  = (
     sortOrder,
   };
 };
-
-export const PaginationHelpers = {
-    paginationAndSortFields
-  };

@@ -1,41 +1,50 @@
-import { Model, Types } from 'mongoose';
+import { Model, Types } from "mongoose";
 
-export type ILocation =
-  | 'Dhaka'
-  | 'Chattogram'
-  | 'Barishal'
-  | 'Rajshahi'
-  | 'Sylhet'
-  | 'Comilla'
-  | 'Rangpur'
-  | 'Mymensingh';
 
-export type ICowBreed =
-  | 'Brahman'
-  | 'Nellore'
-  | 'Sahiwal'
-  | 'Gir'
-  | 'Indigenous'
-  | 'Tharparkar'
-  | 'Kankrej';
+type ICowLocation =
+  | "Dhaka"
+  | "Chattogram"
+  | "Barishal"
+  | "Rajshahi"
+  | "Sylhet"
+  | "Comilla"
+  | "Rangpur"
+  | "Mymensingh";
+
+type ICowBreed =
+  | "Brahman"
+  | "Nellore"
+  | "Sahiwal"
+  | "Gir"
+  | "Indigenous"
+  | "Tharparkar"
+  | "Kankrej";
+
+type ICowLabel = "sale" | "sold out";
+
+type ICowCategory = "Dairy" | "Beef" | "Dual Purpose";
 
 export type ICow = {
   name: string;
   age: number;
   price: number;
-  location: ILocation;
+  location: ICowLocation;
   breed: ICowBreed;
   weight: number;
-  label: 'for sale' | 'sold out';
-  category: 'Dairy' | 'Beef' | 'Dual Purpose';
+  label: ICowLabel;
+  category: ICowCategory;
   seller: Types.ObjectId;
 };
 
-export type ICowFilters = {
-  searchTerm?: string;
-  maxPrice?: string;
-  minPrice?: string;
-  location?: string;
-};
-
 export type CowModel = Model<ICow, Record<string, unknown>>;
+
+export type ICowSearchFilter = {
+  searchTerm?: string;
+  name?: string;
+  breed?: string;
+  location?: string;
+  category?: string;
+  label?: string;
+  minPrice?: number;
+  maxPrice?: number;
+};

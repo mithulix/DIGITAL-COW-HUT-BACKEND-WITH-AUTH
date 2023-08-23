@@ -13,10 +13,11 @@ const globalErrorHandlers: ErrorRequestHandler = (error, req, res) => {
       );
 
   let statusCode = 500;
+  const success = false;
   let message = 'Something went wrong !';
   let errorMessages: IGenericErrorMessage[] = [];
 
-  if (error?.name === 'ValidationError') {
+  if (error.name === 'ValidationError') {
     const simplifiedError = ErrorHandlers.handleValidationError(error);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
@@ -32,7 +33,7 @@ const globalErrorHandlers: ErrorRequestHandler = (error, req, res) => {
     message = simplifiedError.message;
     errorMessages = simplifiedError.errorMessages;
   } else if (error instanceof ApiError) {
-    statusCode = error?.statusCode;
+    statusCode = 400;
     message = error.message;
     errorMessages = error?.message
       ? [
@@ -43,17 +44,19 @@ const globalErrorHandlers: ErrorRequestHandler = (error, req, res) => {
         ]
       : [];
   } else if (error instanceof Error) {
+    statusCode = 500;
     message = error.message;
     errorMessages = [
       {
         path: '',
-        message: error?.message,
+        message: error?.message
       },
     ];
   }
 
   res.status(statusCode).json({
-    success: false,
+    statusCode,
+    success,
     message,
     errorMessages,
     stack: config.env !== 'production' ? error?.stack : undefined,

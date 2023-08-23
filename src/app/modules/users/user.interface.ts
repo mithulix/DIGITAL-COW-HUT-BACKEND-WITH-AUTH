@@ -1,20 +1,30 @@
-import { Model } from 'mongoose';
+import { Model, ObjectId, Document} from 'mongoose';
 
-export type IUserName = {
+type Name = {
   firstName: string;
   lastName: string;
 };
 
-export type IUser = {
-  phoneNumber: string;
-  role: 'seller' | 'buyer';
-  password: string;
-  name: string;
-  address: string;
-  budget: number;
-  income: number;
-};
+type Role = 'seller' | 'buyer';
 
-export const userRoles = ['seller', 'buyer'];
+export type IUser = {
+  _id: ObjectId;
+  name: Name;
+  role: Role;
+  password: string;
+  phoneNumber: string;
+  address: string;
+  budget?: number;
+  income?: number;
+} & Document;
+
 
 export type UserModel = Model<IUser, Record<string, unknown>>;
+
+export type IUserSearchFilter = {
+  searchTerm?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: Role;
+  address?: string;
+};

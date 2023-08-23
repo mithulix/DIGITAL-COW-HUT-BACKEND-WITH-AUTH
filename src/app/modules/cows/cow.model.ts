@@ -1,46 +1,55 @@
-import mongoose, { Schema, model } from 'mongoose';
-import { cowBreeds, cowLabels, cowLocations } from './cow.constant';
+import { Schema, model } from 'mongoose';
 import { CowModel, ICow } from './cow.interface';
+import { cowBreed, cowCategory, cowLabel, cowLocation } from './cow.constant';
 
 const cowSchema = new Schema<ICow>(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     age: {
       type: Number,
       required: true,
+      trim: true,
     },
     price: {
       type: Number,
       required: true,
-    },
-    location: {
-      type: String,
-      enum: cowLocations,
-      required: true,
-    },
-    breed: {
-      type: String,
-      enum: cowBreeds,
-      required: true,
+      trim: true,
     },
     weight: {
       type: Number,
       required: true,
+      trim: true,
     },
-    label: {
+    breed: {
       type: String,
-      enum: cowLabels,
+      enum: cowBreed,
       required: true,
+      trim: true,
+    },
+    location: {
+      type: String,
+      enum: cowLocation,
+      required: true,
+      trim: true,
     },
     category: {
       type: String,
+      enum: cowCategory,
       required: true,
+      trim: true,
+    },
+    label: {
+      type: String,
+      enum: cowLabel,
+      required: true,
+      trim: true,
     },
     seller: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
@@ -52,4 +61,5 @@ const cowSchema = new Schema<ICow>(
     },
   },
 );
+
 export const Cow = model<ICow, CowModel>('Cow', cowSchema);
