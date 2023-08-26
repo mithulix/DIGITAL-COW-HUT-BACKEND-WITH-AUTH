@@ -19,7 +19,7 @@ app.use('/api/v1/', routes_1.AppRoutes);
 app.get('/', (req, res) => {
     const cowResponse = `
     <div style="text-align: center; font-family: Poppins, sans-serif;">
-        <p style="font-size: 10rem;"> 🐂 </p>
+        <p style="font-size: 10rem;"> 🐂🐄 </p>
         <p style="font-size: 50px;"> Welcome to Digital Cow Hut </p>
     </div>
 `;
