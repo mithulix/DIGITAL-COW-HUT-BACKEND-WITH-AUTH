@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { USER_ENUM } from '../../../enum/common';
+import { USER_ENUM } from '../../../enum/userEnum';
 import paginationHelper from '../../../helpers/pagination.helpers';
 import { ApiError } from '../../../shared/errors/ApiError';
 import { IAllDataType } from '../../../shared/interfaces/common.interface';

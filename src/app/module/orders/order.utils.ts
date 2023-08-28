@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
-import { USER_ENUM } from '../../../enum/common';
+import { USER_ENUM } from '../../../enum/userEnum';
 import Order from './order.model';
-import Cow from '../cow/cow.model';
+import Cow from '../cows/cow.model';
 import User from '../users/user.model';
 
 export const isOrderFound = async (id: string): Promise<boolean> => {

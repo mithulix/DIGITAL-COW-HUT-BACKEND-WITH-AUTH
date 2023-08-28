@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { USER_ENUM } from "../../../enum/common";
+import { USER_ENUM } from "../../../enum/userEnum";
 import User from "../users/user.model";
 import Cow from "./cow.model";
 

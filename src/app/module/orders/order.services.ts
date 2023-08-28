@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
-import Cow from '../cow/cow.model';
-import { USER_ENUM } from '../../../enum/common';
+import Cow from '../cows/cow.model';
+import { USER_ENUM } from '../../../enum/userEnum';
 import User from '../users/user.model';
 import { IOrder } from './order.interface';
 import { ApiError } from '../../../shared/errors/ApiError';
