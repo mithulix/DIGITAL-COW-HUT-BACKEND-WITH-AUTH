@@ -1,30 +1,14 @@
-import { Document, Model, ObjectId } from 'mongoose';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Model, Types } from 'mongoose';
+import { IBuyer } from '../buyer/buyer.interface';
+import { ISeller } from '../seller/seller.interface';
 
-type Name = {
-  firstName: string;
-  lastName: string;
-};
-
-type Role = 'seller' | 'buyer';
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export interface IUser extends Document {
-  _id: ObjectId;
-  name: Name;
-  role: Role;
+export type IUser = {
+  _id: any;
+  id: string;
+  role: string;
   password: string;
-  phoneNumber: string;
-  address: string;
-  budget?: number;
-  income?: number;
-}
-
-export type UserModel = Model<IUser, Record<string, unknown>>;
-
-export type IUserSearchFilter = {
-  searchTerm?: string;
-  firstName?: string;
-  lastName?: string;
-  role?: Role;
-  address?: string;
+  seller?: Types.ObjectId | ISeller;
+  buyer?: Types.ObjectId | IBuyer;
 };
+export type UserModel = Model<IUser>;

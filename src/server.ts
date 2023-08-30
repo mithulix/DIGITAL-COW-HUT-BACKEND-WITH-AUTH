@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import app from "./app";
 import config from "./config/envConfig";
-const port = config.PORT;
+const port = config.port;
 
 // Connect Database
 mongoose
-  .connect(config.DATABASE_URL as string)
-  .then(() => console.log("😂 Database connected successfully"))
+  .connect(config.database_url as string)
+  .then(() => console.log("😂 Database connected successfully...."))
   .catch((error) => console.log(`Unable to connect MongoDB: ${error}`));
 
 // Listen to Server

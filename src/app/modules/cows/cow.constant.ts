@@ -1,37 +1,44 @@
+import { ICowFilters } from './cow.interface';
+
 export const cowLocation = [
-  "Dhaka",
-  "Chattogram",
-  "Barishal",
-  "Rajshahi",
-  "Sylhet",
-  "Comilla",
-  "Rangpur",
-  "Mymensingh",
+  'Dhaka',
+  'Chattogram',
+  'Barishal',
+  'Rajshahi',
+  'Sylhet',
+  'Comilla',
+  'Rangpur',
+  'Mymensingh',
 ];
-
 export const cowBreed = [
-  "Brahman",
-  "Nellore",
-  "Sahiwal",
-  "Gir",
-  "Indigenous",
-  "Tharparkar",
-  "Kankrej",
+  'Brahman',
+  'Nellore',
+  'Sahiwal',
+  'Gir',
+  'Indigenous',
+  'Tharparkar',
+  'Kankrej',
+];
+export const cowCategory = ['Dairy', 'Beef', 'DualPurpose'];
+export const cowLabel = ['for sale', 'sold out'];
+
+//------------filter and search option for cows ----------------------
+export const cowSearchableFields = [
+  'id',
+  'name',
+  'breed',
+  'location',
+  'label',
+  'category',
 ];
 
-export const cowLabel = ["sale", "sold out"];
-
-export const cowCategory = ["Dairy", "Beef", "Dual Purpose"];
-
-export const cowSearchFilterOptions = [
-  "searchTerm",
-  "name",
-  "breed",
-  "location",
-  "minPrice",
-  "maxPrice",
-  "category",
-  "label",
+export const cowFilterableFields: (keyof ICowFilters)[] = [
+  'searchTerm',
+  'id',
+  'name',
+  'location',
+  'breed',
+  'price',
+  'minPrice',
+  'maxPrice',
 ];
-
-export const cowSearchFields = ["name", "breed"];

@@ -1,47 +1,35 @@
 import { Schema, model } from 'mongoose';
 import { IUser, UserModel } from './user.interface';
-import { userRole } from './user.constant';
 
-const userSchema = new Schema<IUser>(
+const UserSchema = new Schema<IUser>(
   {
-    name: {
-      firstName: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-    },
-    password: {
+    id: {
       type: String,
       required: true,
-      trim: true,
+      unique: true,
     },
     role: {
       type: String,
       required: true,
-      enum: userRole,
-      trim: true,
     },
-    phoneNumber: {
+    password: {
       type: String,
       required: true,
-      trim: true,
     },
-    address: {
-      type: String,
-      required: true,
-      trim: true,
+    seller: {
+      type: Schema.Types.ObjectId,
+      ref: 'Seller',
     },
-    budget: Number,
-    income: Number,
+    buyer: {
+      type: Schema.Types.ObjectId,
+      ref: 'Buyer',
+    },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+  },
 );
-
-const User = model<IUser, UserModel>('User', userSchema);
-export default User;
+export const User = model<IUser, UserModel>('User', UserSchema);

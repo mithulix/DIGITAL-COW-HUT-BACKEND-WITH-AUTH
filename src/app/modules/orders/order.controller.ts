@@ -1,54 +1,33 @@
-import { RequestHandler } from 'express-serve-static-core';
-import httpStatus from 'http-status';
-import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
-import { paginationFields } from '../../../shared/pagination/pagination.fields';
-import pick from '../../../shared/pagination/pick';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import catchAsync from '../../middlewares/catchAsync';
-import { IOrder } from './order.interface';
+import { Request, Response } from 'express';
 import { OrderService } from './order.services';
+import httpStatus from 'http-status';
+import { IUser } from '../users/user.interface';
+import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
 
-//-------create a new order--------------------------------
-const createOrder: RequestHandler = catchAsync(async (req, res) => {
-  const orderData = req.body;
-  const result = await OrderService.createOrder(orderData);
-
-  sendResponse<IOrder>(res, {
+const sendUserResponse = async (res: Response, message: string, data: any) => {
+  sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Order data created Successfully!',
-    data: result,
+    message,
+    data,
   });
+};
+
+//----------order a new cow ----------------------------------
+const orderCow = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.orderCow(req.body);
+  sendUserResponse(res, ' Order is created  successfully', result);
 });
 
-//-------get all  orders--------------------------------
-const getAllOrders: RequestHandler = catchAsync(async (req, res) => {
-  const paginationOptions = pick(req.query, paginationFields);
-  const result = await OrderService.getAllOrders(paginationOptions);
-
-  sendResponse<IOrder[]>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'All Orders Retrieved Successfully!',
-    meta: result?.meta,
-    data: result?.data,
-  });
-});
-
-//-------get a single order--------------------------------
-const getOrder: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  const result = await OrderService.getOrder(id);
-
-  sendResponse<IOrder>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Order  Retrieved Successfully!',
-    data: result,
-  });
+//----------get all orders ----------------------------------
+const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getAllOrders();
+  sendUserResponse(res, ' All Order are fetched successfully', result);
 });
 
 export const OrderController = {
-  createOrder,
+  orderCow,
   getAllOrders,
-  getOrder,
 };

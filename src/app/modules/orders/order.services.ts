@@ -1,116 +1,87 @@
-import httpStatus from 'http-status';
-import Cow from '../cows/cow.model';
-import { USER_ENUM } from '../../../enum/userEnum';
-import User from '../users/user.model';
+import {Cow} from '../cows/cow.model';
 import { IOrder } from './order.interface';
-import { ApiError } from '../../../shared/errors/ApiError';
 import mongoose from 'mongoose';
 import Order from './order.model';
-import { IPagination } from '../../../shared/pagination/pagination.interface';
-import { IAllDataType } from '../../../shared/interfaces/common.interface';
-import paginationHelper from '../../../helpers/pagination.helpers';
-import { isOrderFound } from './order.utils';
 
-//--------create a new order service------------------------------
-const createOrder = async (payload: IOrder): Promise<IOrder | null> => {
-  const cowId = payload.cow;
-  const buyerId = payload.buyer;
+import { Seller } from '../seller/seller.model';
+import { Buyer } from '../buyer/buyer.model';
 
-  const cow = await Cow.findById(cowId).populate('seller');
-
-  const buyer = await User.findOne({
-    _id: buyerId,
-    role: USER_ENUM.BUYER,
-  });
-
-  if (!cow) throw new ApiError(httpStatus.BAD_REQUEST, 'Cow not Found!');
-  if (!buyer) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Buyer account is incorrect!');
-  }
-
-  const cowPrice = cow.price;
-  let buyerBudget = buyer.budget || 0;
-
-  if (cowPrice > buyerBudget)
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Buyer don't have enough budget to buy this cow!",
-    );
-
-  let orderData;
+//-------- order a new cow service------------------------------
+const orderCow = async (order: IOrder) => {
   const session = await mongoose.startSession();
-
+  let newOrderData = null;
   try {
     session.startTransaction();
+    // Find the cow to be sold
+    //cow:id
+    //buyer:id
+    const cow = await Cow.findById(order.cow).session(session);
+    if (!cow) {
+      throw new Error('Cow not found');
+    }
+    // Check if the cow is available for sale
+    if (cow.label !== 'for sale') {
+      throw new Error('The cow is not available for sale');
+    }
 
-    // 1. Create the Order
-    const data = await Order.create([payload], { session });
-    orderData = data[0];
+    // Find the seller
+    const seller = await Seller.findById(cow.seller).session(session);
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
 
-    // 2. Decrease Buyer Budget
-    buyerBudget = buyerBudget - cowPrice;
-    console.log(buyerBudget);
-    await User.findOneAndUpdate(
-      { _id: buyer, role: USER_ENUM.BUYER },
-      { budget: buyerBudget },
+    // Find the buyer
+    const buyer = await Buyer.findById(order.buyer).session(session);
+    if (!buyer) {
+      throw new Error('Buyer not found');
+    }
+    // Check if the buyer has enough budget to buy the cow
+    if (buyer.budget < cow.price) {
+      throw new Error('Buyer does not have enough budget to buy the cow');
+    }
+
+    // Update the cow's status to sold
+    cow.label = 'sold out';
+    await cow.save();
+
+    // Transfer money from buyer to seller
+    seller.income += cow.price;
+    buyer.budget -= cow.price;
+    await seller.save();
+    await buyer.save();
+
+    const newOrder = await Order.create(
+      {
+        cow: cow._id,
+        buyer: buyer._id,
+      },
+      { session },
     );
 
-    // 3. Increase Seller Income
-    const sellerId = cow?.seller?._id;
-    await User.findByIdAndUpdate(
-      { _id: sellerId, role: USER_ENUM.SELLER },
-      { $inc: { income: cowPrice } },
-    );
+    newOrderData = newOrder[0];
+
+    // Populate the 'buyer' field in the newOrder document
+    const populatedOrder = await Order.findById(newOrderData._id)
+      .populate('buyer')
+      .populate('cow');
 
     await session.commitTransaction();
     await session.endSession();
+    return populatedOrder;
   } catch (error) {
-    console.log(error);
     await session.abortTransaction();
     await session.endSession();
-    throw new Error('Failed to make Order!');
+    throw error;
   }
-
-  if (orderData) {
-    orderData = await Order.findById(orderData._id).populate('cow buyer');
-  }
-
-  return orderData;
 };
 
 //--------get all orders service------------------------------
-const getAllOrders = async (
-  paginationOptions: IPagination,
-): Promise<IAllDataType<IOrder[]> | null> => {
-  // Pagination
-  const { page, limit, skip, sortBy, sortOrder } =
-    paginationHelper(paginationOptions);
-
-  // Sort Condition
-  const sortCondition = { [sortBy]: sortOrder };
-
-  const data = await Order.find()
-    .populate('cow buyer')
-    .sort(sortCondition)
-    .skip(skip)
-    .limit(limit);
-  const total = await Order.countDocuments();
-  const meta = { page, limit, total };
-  return { meta, data };
-};
-
-//--------get single order service------------------------------
-const getOrder = async (id: string): Promise<IOrder | null> => {
-  if (!(await isOrderFound(id))) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Order not Found!');
-  }
-
-  const data = await Order.findById(id).populate('cow buyer');
-  return data;
+const getAllOrders = async () => {
+  const result = await Order.find({}).populate('cow').populate('buyer');
+  return result;
 };
 
 export const OrderService = {
-  createOrder,
+  orderCow,
   getAllOrders,
-  getOrder,
 };

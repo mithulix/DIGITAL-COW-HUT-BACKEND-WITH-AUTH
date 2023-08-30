@@ -1,87 +1,72 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RequestHandler } from 'express-serve-static-core';
 import httpStatus from 'http-status';
+import { Request, Response } from 'express';
 import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
-import { paginationFields } from '../../../shared/pagination/pagination.fields';
-import pick from '../../../shared/pagination/pick';
 import catchAsync from '../../middlewares/catchAsync';
-import { userSearchFilterOptions } from './user.constant';
 import { IUser } from './user.interface';
 import { UserService } from './user.services';
 
-//----------signup a new user buyer / seller--------------------------------
-const signup: RequestHandler = catchAsync(async (req, res) => {
-  const userData = req.body;
-  const result = await UserService.signup(userData);
-
+//----------send user response-----------------------------------
+const sendUserResponse = async (res: Response, message: string, data: any) => {
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User Signed up Successfully!',
-    data: result,
+    message,
+    data,
   });
-});
+};
+//----------signup a new user seller--------------------------------
+const createSeller: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { seller, ...userData } = req.body;
+    const result = await UserService.createSeller(seller, userData);
+    sendUserResponse(res, 'Seller created successfully!', result);
+  }
+);
+
+//----------signup a new user buyer--------------------------------
+const createBuyer: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const { buyer, ...userData } = req.body;
+    const result = await UserService.createBuyer(buyer, userData);
+    sendUserResponse(res, 'Buyer created successfully!', result);
+  }
+);
 
 //---------get all users----------------------------------
-const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
-  const paginationOptions = pick(req.query, paginationFields);
-  const searchFilterFields = pick(req.query, userSearchFilterOptions);
-  const result = await UserService.getAllUsers(
-    paginationOptions,
-    searchFilterFields,
-  );
-
-  sendResponse<IUser[]>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'All Users Retrieved Successfully!',
-    meta: result?.meta,
-    data: result?.data,
-  });
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsers();
+  sendUserResponse(res, ' All  Users are fetched successfully', result);
 });
 
-//---------get a single user----------------------------------
-const getUser: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  const result = await UserService.getUser(id);
 
-  sendResponse<IUser>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'User Retrieved Successfully!',
-    data: result,
-  });
+//---------get a single user----------------------------------
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.getSingleUser(id);
+  sendUserResponse(res, 'Single User is found', result);
 });
 
 //---------update a user----------------------------------
-const updateUser: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  const userData = req.body;
-  const result = await UserService.updateUser(id, userData);
-
-  sendResponse<IUser>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'User Updated Successfully!',
-    data: result,
-  });
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.updateUser(id, req.body);
+  await sendUserResponse(res, `User is Updated successfully`, result);
 });
-//---------delete a user----------------------------------
-const deleteUser: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  const result = await UserService.deleteUser(id);
 
-  sendResponse<IUser>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'User Deleted Successfully!',
-    data: result,
-  });
+//---------delete a user----------------------------------
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.deleteUser(id);
+  await sendUserResponse(res, `User is Deleted successfully`, result);
 });
 
 export const UserController = {
-  signup,
+  createSeller,
+  createBuyer,
   getAllUsers,
-  getUser,
+  getSingleUser,
   updateUser,
   deleteUser,
 };

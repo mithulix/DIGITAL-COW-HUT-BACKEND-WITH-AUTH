@@ -1,18 +1,19 @@
 import express from 'express';
-import { CowValidation } from './cow.validation';
 import { CowController } from './cow.controller';
 import validateZodRequest from '../../middlewares/validateZodRequest';
+import { CowValidation } from './cow.validation';
+
 const router = express.Router();
 
 router.post(
   '/create-cow',
-  validateZodRequest(CowValidation.createCowZodSchema),
+  validateZodRequest(CowValidation.updateCowZodSchema),
   CowController.createCow,
 );
 
-router.get('/', CowController.getAllCows);
+router.get('/:id', CowController.getSingleCow);
 
-router.get('/:id', CowController.getCow);
+router.delete('/:id', CowController.deleteCow);
 
 router.patch(
   '/:id',
@@ -20,6 +21,6 @@ router.patch(
   CowController.updateCow,
 );
 
-router.delete('/:id', CowController.deleteCow);
+router.get('/', CowController.getAllCows);
 
 export const CowRoutes = router;

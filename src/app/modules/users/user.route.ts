@@ -5,15 +5,19 @@ import validateZodRequest from '../../middlewares/validateZodRequest';
 
 const router = express.Router();
 
-router.post(
-  '/signup',
-  validateZodRequest(UserValidation.signupZodSchema),
-  UserController.signup,
+export const SignUpSellerRoutes = router.post(
+  '/signup-seller',
+  UserController.createSeller,
+);
+
+export const SignUpBuyerRoutes = router.post(
+  '/signup-buyer',
+  UserController.createBuyer,
 );
 
 router.get('/', UserController.getAllUsers);
 
-router.get('/:id', UserController.getUser);
+router.get('/:id', UserController.getSingleUser);
 
 router.patch(
   '/:id',

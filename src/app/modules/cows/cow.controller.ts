@@ -1,87 +1,69 @@
-import { RequestHandler } from "express-serve-static-core";
-import httpStatus from "http-status";
-import sendResponse from "../../../shared/logger&sendResponse/sendResponse";
-import { paginationFields } from "../../../shared/pagination/pagination.fields";
-import pick from "../../../shared/pagination/pick";
-import catchAsync from "../../middlewares/catchAsync";
-import { cowSearchFilterOptions } from "./cow.constant";
-import { ICow } from "./cow.interface";
-import { CowService } from "./cow.services";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
+import { paginationFields } from '../../../shared/pagination/pagination.fields';
+import pick from '../../../shared/pagination/pick';
+import catchAsync from '../../middlewares/catchAsync';
+import { ICow } from './cow.interface';
+import { Request, Response } from 'express';
+import { CowService } from './cow.services';
+import { cowFilterableFields } from './cow.constant';
 
-//-------create a new cow--------------------------
-const createCow: RequestHandler = catchAsync(async (req, res) => {
-  const cowData = req.body;
-  const result = await CowService.createCow(cowData);
-
+const sendCowResponse = async (res: Response, message: string, data: any) => {
   sendResponse<ICow>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Cow data created Successfully!",
-    data: result,
+    message,
+    data,
   });
+};
+
+//-------create a new cow--------------------------
+const createCow = catchAsync(async (req: Request, res: Response) => {
+  const { ...CowData } = req.body;
+  const result = await CowService.createCow(CowData);
+  sendCowResponse(res, 'Cow is created successfully', result);
 });
 
 //-------get all cows--------------------------
-const getAllCows: RequestHandler = catchAsync(async (req, res) => {
+const getAllCows = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, cowFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
-  const searchFilterFields = pick(req.query, cowSearchFilterOptions);
-  const result = await CowService.getAllCows(
-    paginationOptions,
-    searchFilterFields
-  );
 
-  sendResponse<ICow[]>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "All Cows Retrieved Successfully!",
-    meta: result?.meta,
-    data: result?.data,
-  });
+  const result = await CowService.getAllCows(filters, paginationOptions);
+
+  sendCowResponse(res, ' All Cows fetched successfully', result);
 });
 
-const getCow: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  const result = await CowService.getCow(id);
-
-  sendResponse<ICow>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Cow Retrieved Successfully",
-    data: result,
-  });
+//------------get a single cow---------------------------------
+const getSingleCow = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await CowService.getSingleCow(id);
+  sendCowResponse(res, 'Single Cow is found', result);
 });
 
 //-------update a cow--------------------------
-const updateCow: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  const cowData = req.body;
-  const result = await CowService.updateCow(id, cowData);
+const updateCow = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-  sendResponse<ICow>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Cow Updated Successfully!",
-    data: result,
-  });
+  const result = await CowService.updateCow(id, req.body);
+
+  await sendCowResponse(res, `Cow is Updated successfully`, result);
 });
 
 //-------delete a cow--------------------------
-const deleteCow: RequestHandler = catchAsync(async (req, res) => {
-  const id = req.params.id;
+const deleteCow = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
   const result = await CowService.deleteCow(id);
 
-  sendResponse<ICow>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Cow Deleted Successfully!",
-    data: result,
-  });
+  await sendCowResponse(res, `Cow is Deleted successfully`, result);
 });
 
 export const CowController = {
   createCow,
   getAllCows,
-  getCow,
+  getSingleCow,
   updateCow,
   deleteCow,
 };

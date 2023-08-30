@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { userRole } from './user.constant';
+
 const signupZodSchema = z.object({
   body: z.object({
     name: z.object({

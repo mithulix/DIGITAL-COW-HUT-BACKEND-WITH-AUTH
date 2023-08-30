@@ -5,3 +5,8 @@ export type IErrorResponse = {
   message: string;
   errorMessage: IErrorMessage[];
 };
+
+export type IGenericErrorMessage = {
+  path: string | number;
+  message: string;
+};

@@ -1,128 +1,159 @@
 import httpStatus from 'http-status';
-import { USER_ENUM } from '../../../enum/userEnum';
-import paginationHelper from '../../../helpers/pagination.helpers';
+import config from '../../../config/envConfig';
+import {User} from './user.model';
 import { ApiError } from '../../../shared/errors/ApiError';
-import { IAllDataType } from '../../../shared/interfaces/common.interface';
-import { IPagination } from '../../../shared/pagination/pagination.interface';
+import { IUser } from './user.interface';
+import mongoose from 'mongoose';
+import { generateBuyerId, generateSellerId } from './user.utils';
+import { ISeller } from '../seller/seller.interface';
+import { Seller } from '../seller/seller.model';
+import { IBuyer } from '../buyer/buyer.interface';
+import { Buyer } from '../buyer/buyer.model';
 
-import { userSearchFields } from './user.constant';
-import { IUser, IUserSearchFilter } from './user.interface';
-import User from './user.model';
-import isUserFound from './user.utils';
+//------------create a new seller ------------------------------------
+const createSeller = async (
+  seller: ISeller,
+  user: IUser,
+): Promise<IUser | null> => {
+  if (!user.password) {
+    user.password = config.default_user_pass as string;
+  }
+  user.role = 'seller';
 
-//------signup a new user service---------------------------------------
-const signup = async (payload: IUser): Promise<IUser | null> => {
-  if (payload.role == USER_ENUM.BUYER) {
-    if (!payload.budget)
-      throw new ApiError(httpStatus.NOT_FOUND, 'Budget is Required!');
-    if (payload.budget < 15000) {
-      throw new ApiError(
-        httpStatus.NOT_FOUND,
-        'Budget should be at least more than 15000!',
-      );
+  let newUserAllData = null;
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const id = await generateSellerId();
+    user.id = id; //s-00001
+    seller.id = id; //s-00001
+
+    const newSeller = await Seller.create([seller], { session });
+
+    if (!newSeller.length) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create Seller');
     }
+
+    user.seller = newSeller[0]._id;
+    const newUser = await User.create([user], { session });
+
+    if (!newUser.length) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create user');
+    }
+    newUserAllData = newUser[0];
+
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw error;
   }
 
-  if (payload.role == USER_ENUM.SELLER) payload.income = 0;
+  if (newUserAllData) {
+    newUserAllData = await User.findOne({ id: newUserAllData.id }).populate({
+      path: 'seller',
+    });
+  }
+  return newUserAllData;
+};
 
-  const data = await User.create(payload);
-  return data;
+//------------create a new seller ------------------------------------
+const createBuyer = async (
+  buyer: IBuyer,
+  user: IUser,
+): Promise<IUser | null> => {
+  if (!user.password) {
+    user.password = config.default_user_pass as string;
+  }
+  user.role = 'buyer';
+
+  let newUserAllData = null;
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const id = await generateBuyerId();
+    user.id = id;
+    buyer.id = id;
+
+    const newBuyer = await Buyer.create([buyer], { session });
+
+    if (!newBuyer.length) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create buyer');
+    }
+
+    user.buyer = newBuyer[0]._id;
+
+    const newUser = await User.create([user], { session });
+
+    if (!newUser.length) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create user');
+    }
+    newUserAllData = newUser[0];
+
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw error;
+  }
+
+  if (newUserAllData) {
+    newUserAllData = await User.findOne({ id: newUserAllData.id }).populate({
+      path: 'buyer',
+    });
+  }
+
+  return newUserAllData;
 };
 
 //------get all users service---------------------------------------
-const getAllUsers = async (
-  paginationOptions: IPagination,
-  searchFilterFields: IUserSearchFilter,
-): Promise<IAllDataType<IUser[]> | null> => {
-  // Pagination
-  const { page, limit, skip, sortBy, sortOrder } =
-    paginationHelper(paginationOptions);
-
-  // Sort Condition
-  const sortCondition = { [sortBy]: sortOrder };
-
-  const { searchTerm, ...filterdata } = searchFilterFields;
-  const andCondition = [];
-
-  // Search Condition
-  if (searchTerm) {
-    andCondition.push({
-      $or: userSearchFields.map(field => ({
-        [field]: { $regex: searchTerm, $options: 'i' },
-      })),
-    });
-  }
-
-  // Filter Fields
-  if (Object.keys(filterdata).length) {
-    andCondition.push({
-      $and: Object.entries(filterdata).map(([field, value]) => ({
-        [field]: [value],
-      })),
-    });
-  }
-
-  const whereCondition = andCondition.length ? { $and: andCondition } : {};
-
-  const data = await User.find(whereCondition)
-    .sort(sortCondition)
-    .skip(skip)
-    .limit(limit);
-  const total = await User.countDocuments();
-  const meta = { page, limit, total };
-  return { meta, data };
+const getAllUsers = async () => {
+  const result = await User.find({}).populate('seller').populate('buyer');
+  return result;
 };
 
 //------get a single user service---------------------------------------
-const getUser = async (id: string): Promise<IUser | null> => {
-  if (!(await isUserFound(id))) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not Found!');
-  }
-
-  const data = await User.findById(id);
-  return data;
+const getSingleUser = async (id: string) => {
+  const result = await User.findById(id).populate('seller').populate('buyer');
+  return result;
 };
 
 //------update a user service---------------------------------------
-const updateUser = async (
-  _id: string,
-  payload: IUser,
-): Promise<IUser | null> => {
-  if (!(await isUserFound(_id))) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not Found!');
-  }
-
-  const { name, ...userData } = payload;
-
-  if (name && Object.keys(name).length) {
-    Object.keys(name).map(field => {
-      const nameKey = `name.${field}`;
-      (userData as any)[nameKey] = name[field as keyof typeof name];
-    });
-  }
-
-  const data = await User.findOneAndUpdate({ _id }, userData, {
+const updateUser = async (id: string, payload: Partial<IUser>) => {
+  const result = await User.findByIdAndUpdate({ _id: id }, payload, {
     new: true,
-    runValidators: true,
   });
-
-  return data;
+  return result;
 };
 
 //-------delete a user service--------------------------------
-const deleteUser = async (id: string): Promise<IUser | null> => {
-  if (!(await isUserFound(id))) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not Found!');
+const deleteUser = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
 
-  const data = await User.findByIdAndDelete(id);
-  return data;
+  const result = await User.findByIdAndDelete(id);
+
+  let buyerDelete = null;
+  let sellerDelete = null;
+
+  if (user.buyer) {
+    buyerDelete = await Buyer.findByIdAndDelete({ _id: user.buyer });
+  }
+  if (user.seller) {
+    sellerDelete = await Seller.findByIdAndDelete({ _id: user.seller });
+  }
+  return { result, buyerDelete, sellerDelete };
 };
 
 export const UserService = {
-  signup,
+  createSeller,
+  createBuyer,
   getAllUsers,
-  getUser,
+  getSingleUser,
   updateUser,
   deleteUser,
 };

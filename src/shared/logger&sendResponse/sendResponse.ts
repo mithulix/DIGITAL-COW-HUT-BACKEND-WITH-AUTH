@@ -1,15 +1,16 @@
 import { Response } from 'express';
 import { IApiResponse } from '../interfaces/common.interface';
 
-const sendResponse = <T>(res: Response, responseData: IApiResponse<T>) => {
-  const response: IApiResponse<T> = {
-    statusCode: responseData.statusCode,
-    success: responseData.success,
-    message: responseData.message,
-    meta: responseData.meta,
-    data: responseData.data,
+const sendResponse = <T>(res: Response, data: IApiResponse<T>): void => {
+  const responseData: IApiResponse<T> = {
+    statusCode: data.statusCode,
+    success: data.success,
+    message: data.message || null,
+    meta: data.meta || null || undefined,
+    data: data.data || null,
   };
-  res.status(responseData.statusCode).json(response);
+
+  res.status(data.statusCode).json(responseData);
 };
 
 export default sendResponse;

@@ -1,16 +1,25 @@
 import express from 'express';
-import { CowRoutes } from '../app/module/cows/cow.route';
-import { OrderRoutes } from '../app/module/orders/order.route';
-import { UserRoutes } from '../app/module/users/user.route';
+import { UserRoutes } from '../app/modules/users/user.route';
+import { CowRoutes } from '../app/modules/cows/cow.route';
+import { OrderRoutes } from '../app/modules/orders/order.route';
+import { SellerRoutes } from '../app/modules/seller/seller.route';
+import { BuyerRoutes } from '../app/modules/buyer/buyer.route';
 
 const router = express.Router();
 
 const moduleRoutes = [
-
   {
     path: '/users',
     route: UserRoutes,
   },
+  {
+    path: '/buyers',
+    route: BuyerRoutes,
+},
+{
+    path: '/sellers',
+    route: SellerRoutes,
+},
   {
     path: '/cows',
     route: CowRoutes,
@@ -19,6 +28,7 @@ const moduleRoutes = [
     path: '/orders',
     route: OrderRoutes,
   },
+  
 ];
 
 moduleRoutes.forEach(route => router.use(route.path, route.route));
