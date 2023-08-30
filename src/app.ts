@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 // Application Route
 app.use('/api/v1/', AppRoutes);
 
+
 // Api route entry point
 app.get('/', (req: Request, res: Response) => {
   const cowResponse = `
