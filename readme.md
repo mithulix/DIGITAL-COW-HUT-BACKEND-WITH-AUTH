@@ -1,4 +1,4 @@
-### WELCOME TO DIGITAL COW HUT BACKEND PROJECT.
+### WELCOME TO DIGITAL-COW-HUT PROJECT.
 
 ### LIVE PREVIEW -> https://digital-cow-hut-backend-jade.vercel.app/
 
