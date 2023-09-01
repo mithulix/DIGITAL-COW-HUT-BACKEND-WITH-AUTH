@@ -1,8 +1,8 @@
-### welcome to digital-cow-hut project.
+### WELCOME TO DIGITAL-COW-HUT PROJECT.
 
-### Live Preview --->> https://digital-cow-hut-backend-jade.vercel.app/
+### LIVE PREVIEW -> https://digital-cow-hut-backend-jade.vercel.app/
 
-### Table of Contents:
+### TABLE OF CONTENTS :
 
 1. [User](#user)
 2. [Cow](#cow)
