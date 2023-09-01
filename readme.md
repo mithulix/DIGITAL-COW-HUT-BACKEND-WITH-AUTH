@@ -5,32 +5,47 @@
 ### TABLE OF CONTENTS :
 
 1. [User](#user)
-2. [Cow](#cow)
-3. [Order](#order)
-4. [Pagination](#pagination)
+2. [Buyer](#buyer)
+3. [Seller](#seller)
+4. [Cows](#cows)
 5. [Orders](#orders)
+6. [Pagination](#pagination)
 
-### User
+### User : 
 
+- `POST /users/signup-buyer`: create a new buyer.
+- `POST /users/signup-seller`: create a new seller.
 - `GET /users`: Retrieve a list of users.
 - `GET /users/{id}`: Retrieve details of a specific user.
-- `POST /users`: Create a new user.
-- `PUT /users/{id}`: Update an existing user.
+- `PATCH /users/{id}`: Update an existing user.
 - `DELETE /users/{id}`: Delete a user.
 
-### Cow
+### Buyer : 
 
-- `GET /cows`: Retrieve a list of cows.
+- `GET /buyers/`: Retrieve a list of buyer.
+- `GET /buyers/{id}`: Retrieve details of a specific buyer.
+- `PATCH /buyers/{id}`: Update an existing buyer.
+- `DELETE /buyers/{id}`: Delete a buyer.
+
+### Seller : 
+- `GET /sellers`: Retrieve a list of seller.
+- `GET /sellers/{id}`: Retrieve details of a specific seller.
+- `PATCH /sellers/{id}`: Update an existing seller.
+- `DELETE /sellers/{id}`: Delete a seller.
+
+### Cows : 
+
+- `GET /cows/create-cow`: Create a new cow.
 - `GET /cows/{id}`: Retrieve details of a specific cow.
-- `POST /cows`: Create a new cow.
-- `PUT /cows/{id}`: Update an existing cow.
+- `GET /cows/`: Retrieve a list of cows.
+- `PATCH /cows/{id}`: Update an existing cow.
 - `DELETE /cows/{id}`: Delete a cow.
 
-### Order
+### Orders : 
 
-- `GET /orders`: Retrieve a list of orders.
+- `POST /orders/order-cow`: Create a new order.
+- `GET /orders/`: Retrieve a list of orders.
 - `GET /orders/{id}`: Retrieve details of a specific order.
-- `POST /orders`: Create a new order.
 
 ### Pagination
 
@@ -41,9 +56,3 @@
 - api/v1/cows?minPrice=20000&maxPrice=70000
 - api/v1/cows?location=Chattogram
 - api/v1/cows?searchTerm=Cha
-
-### Orders
-
-- api/v1/orders (POST)
-- api/v1/orders (GET)
-- api/v1/orders/648f20d2cf3746f1ec2a9437 (GET) Include an id that is saved in your database

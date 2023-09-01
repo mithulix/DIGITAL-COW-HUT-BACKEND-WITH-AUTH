@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
 import catchAsync from '../../middlewares/catchAsync';
 import { IUser } from './user.interface';
-import { UserService } from './user.services';
+import { UserService } from './user.service';
 
 //----------send user response-----------------------------------
 const sendUserResponse = async (res: Response, message: string, data: any) => {

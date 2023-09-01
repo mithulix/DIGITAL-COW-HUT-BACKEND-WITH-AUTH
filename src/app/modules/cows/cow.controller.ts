@@ -6,7 +6,7 @@ import pick from '../../../shared/pagination/pick';
 import catchAsync from '../../middlewares/catchAsync';
 import { ICow } from './cow.interface';
 import { Request, Response } from 'express';
-import { CowService } from './cow.services';
+import { CowService } from './cow.service';
 import { cowFilterableFields } from './cow.constant';
 
 const sendCowResponse = async (res: Response, message: string, data: any) => {

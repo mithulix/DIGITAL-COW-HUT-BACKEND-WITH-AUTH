@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import catchAsync from '../../middlewares/catchAsync';
 import { Request, Response } from 'express';
-import { OrderService } from './order.services';
+import { OrderService } from './order.service';
 import httpStatus from 'http-status';
 import { IUser } from '../users/user.interface';
 import sendResponse from '../../../shared/logger&sendResponse/sendResponse';

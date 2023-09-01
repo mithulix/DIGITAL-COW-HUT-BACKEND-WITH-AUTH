@@ -4,7 +4,7 @@ import sendResponse from '../../../shared/logger&sendResponse/sendResponse';
 import httpStatus from 'http-status';
 import { ISeller } from './seller.interface';
 import catchAsync from '../../middlewares/catchAsync';
-import { SellerService } from './seller.sevice';
+import { SellerService } from './seller.service';
 
 
 const sendSellerResponse = async (
