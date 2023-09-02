@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
 import config from '../../../config/envConfig';
-import {User} from './user.model';
+import { User } from './user.model';
 import { ApiError } from '../../../shared/errors/ApiError';
 import { IUser } from './user.interface';
 import mongoose from 'mongoose';
@@ -9,6 +10,10 @@ import { ISeller } from '../seller/seller.interface';
 import { Seller } from '../seller/seller.model';
 import { IBuyer } from '../buyer/buyer.interface';
 import { Buyer } from '../buyer/buyer.model';
+import { ENUM_USER_ROLE } from '../../../enum/userEnum';
+import { Admin } from '../admin/admin.model';
+import { JwtPayload } from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 //------------create a new seller ------------------------------------
 const createSeller = async (
@@ -44,10 +49,10 @@ const createSeller = async (
 
     await session.commitTransaction();
     await session.endSession();
-  } catch (error) {
+  } catch (ApiError) {
     await session.abortTransaction();
     await session.endSession();
-    throw error;
+    throw ApiError;
   }
 
   if (newUserAllData) {
@@ -58,7 +63,7 @@ const createSeller = async (
   return newUserAllData;
 };
 
-//------------create a new seller ------------------------------------
+//------------create a new buyer ------------------------------------
 const createBuyer = async (
   buyer: IBuyer,
   user: IUser,
@@ -93,10 +98,10 @@ const createBuyer = async (
 
     await session.commitTransaction();
     await session.endSession();
-  } catch (error) {
+  } catch (ApiError) {
     await session.abortTransaction();
     await session.endSession();
-    throw error;
+    throw ApiError;
   }
 
   if (newUserAllData) {
@@ -149,6 +154,92 @@ const deleteUser = async (id: string) => {
   return { result, buyerDelete, sellerDelete };
 };
 
+//------- create my profile --------------------------------
+const myProfile = async (user: JwtPayload | null) => {
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+  }
+  let result;
+
+  if (user.role === ENUM_USER_ROLE.BUYER) {
+    const buyer = await User.findOne({ phoneNumber: user.phoneNumber });
+    if (!buyer) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Buyer not found');
+    }
+    result = await User.find({ buyer: buyer.buyer }).populate('buyer');
+  } else if (user.role === ENUM_USER_ROLE.SELLER) {
+    const seller = await User.findOne({ phoneNumber: user.phoneNumber });
+    if (!seller) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'seller not found');
+    }
+    result = await User.find({ seller: seller.seller }).populate('seller');
+  } else if (user.role === ENUM_USER_ROLE.ADMIN) {
+    result = await Admin.findOne({ phoneNumber: user.phoneNumber });
+    if (!result) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'admin not found');
+    }
+  }
+
+  return result;
+};
+
+//------- update user profile --------------------------------
+const updateUserProfile = async (user: JwtPayload | null, payload: any) => {
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  if (payload.password) {
+    const hashedPassword = await bcrypt.hash(
+      payload.password,
+      Number(config.default_salt_rounds),
+    );
+    payload.password = hashedPassword;
+  }
+
+  let result;
+
+  if (user.role === ENUM_USER_ROLE.BUYER) {
+    const buyer = await User.findOne({ phoneNumber: user.phoneNumber });
+    if (!buyer) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Buyer not found');
+    }
+
+    result = await User.findOneAndUpdate(
+      { phoneNumber: user.phoneNumber },
+      { password: payload.password },
+      { new: true },
+    ).populate('buyer');
+    const id = buyer?.buyer;
+    await Buyer.findByIdAndUpdate({ _id: id }, payload, {
+      new: true,
+    });
+  } else if (user.role === ENUM_USER_ROLE.SELLER) {
+    const seller = await User.findOne({ phoneNumber: user.phoneNumber });
+    if (!seller) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'seller not found');
+    }
+
+    result = await User.findOneAndUpdate(
+      { phoneNumber: user.phoneNumber },
+      { password: payload.password },
+      { new: true },
+    ).populate('seller');
+    const id = seller?.seller;
+    await Seller.findByIdAndUpdate({ _id: id }, payload, {
+      new: true,
+    });
+  } else if (user.role === ENUM_USER_ROLE.ADMIN) {
+    result = await Admin.findOneAndUpdate(
+      { phoneNumber: user.phoneNumber },
+      payload,
+      { new: true },
+    );
+  }
+
+  return result;
+};
+
 export const UserService = {
   createSeller,
   createBuyer,
@@ -156,4 +247,6 @@ export const UserService = {
   getSingleUser,
   updateUser,
   deleteUser,
+  myProfile,
+  updateUserProfile,
 };

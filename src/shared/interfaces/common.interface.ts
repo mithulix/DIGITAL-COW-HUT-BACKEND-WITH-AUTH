@@ -1,4 +1,4 @@
-import { IGenericErrorMessage } from "../errors/typeError";
+import { IGenericErrorMessage } from '../errors/typeError';
 
 export type IApiResponse<T> = {
   statusCode: number;

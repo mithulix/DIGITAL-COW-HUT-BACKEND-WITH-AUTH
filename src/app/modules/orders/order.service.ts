@@ -81,7 +81,14 @@ const getAllOrders = async () => {
   return result;
 };
 
+//--------get single order service------------------------------
+const getSingleOrder = async (id: string) => {
+  const result = await Order.findById(id).populate('cow').populate('buyer');
+  return result;
+};
+
 export const OrderService = {
   orderCow,
+  getSingleOrder,
   getAllOrders,
 };

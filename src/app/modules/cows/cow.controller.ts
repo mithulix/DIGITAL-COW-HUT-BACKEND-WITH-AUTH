@@ -32,7 +32,7 @@ const getAllCows = catchAsync(async (req: Request, res: Response) => {
 
   const result = await CowService.getAllCows(filters, paginationOptions);
 
-  sendCowResponse(res, ' All Cows fetched successfully', result);
+  sendCowResponse(res, ' All Cow Cows fetched successfully', result);
 });
 
 //------------get a single cow---------------------------------
@@ -45,18 +45,16 @@ const getSingleCow = catchAsync(async (req: Request, res: Response) => {
 //-------update a cow--------------------------
 const updateCow = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-
-  const result = await CowService.updateCow(id, req.body);
-
-  await sendCowResponse(res, `Cow is Updated successfully`, result);
+  const { user } = req;
+  const result = await CowService.updateCow(id, user, req.body);
+  await sendCowResponse(res, `Cow is updated successfully`, result);
 });
 
 //-------delete a cow--------------------------
 const deleteCow = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-
-  const result = await CowService.deleteCow(id);
-
+  const { user } = req;
+  const result = await CowService.deleteCow(id, user);
   await sendCowResponse(res, `Cow is Deleted successfully`, result);
 });
 

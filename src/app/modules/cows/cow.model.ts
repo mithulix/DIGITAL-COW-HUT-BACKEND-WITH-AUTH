@@ -4,7 +4,6 @@ import { cowBreed, cowCategory, cowLabel, cowLocation } from './cow.constant';
 import { ApiError } from '../../../shared/errors/ApiError';
 import httpStatus from 'http-status';
 
-
 export const CowSchema = new Schema<ICow, CowModel>(
   {
     name: {

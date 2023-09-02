@@ -21,6 +21,13 @@ const orderCow = catchAsync(async (req: Request, res: Response) => {
   sendUserResponse(res, ' Order is created  successfully', result);
 });
 
+//----------get single order ----------------------------------
+const getSingleOrder = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await OrderService.getSingleOrder(id);
+  sendUserResponse(res, 'Single Order is return', result);
+});
+
 //----------get all orders ----------------------------------
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   const result = await OrderService.getAllOrders();
@@ -29,5 +36,6 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
 
 export const OrderController = {
   orderCow,
+  getSingleOrder,
   getAllOrders,
 };

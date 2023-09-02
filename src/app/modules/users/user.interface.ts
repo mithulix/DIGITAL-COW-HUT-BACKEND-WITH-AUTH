@@ -8,7 +8,16 @@ export type IUser = {
   id: string;
   role: string;
   password: string;
+  phoneNumber: string;
   seller?: Types.ObjectId | ISeller;
   buyer?: Types.ObjectId | IBuyer;
 };
-export type UserModel = Model<IUser>;
+export type UserModel = {
+  isUserExist(
+    phoneNumber: string,
+  ): Promise<Pick<IUser, 'phoneNumber' | 'password' | 'role'>>;
+  isPasswordMatched(
+    givenPassword: string,
+    savedPassword: string,
+  ): Promise<boolean>;
+} & Model<IUser>;

@@ -5,6 +5,10 @@ import { paginationHelpers } from '../../../helpers/pagination.helpers';
 import { cowSearchableFields } from './cow.constant';
 import { Cow } from './cow.model';
 import { IPaginationOptions } from '../../../shared/pagination/pagination.interface';
+import { ApiError } from '../../../shared/errors/ApiError';
+import { User } from '../users/user.model';
+import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 
 //-------create a new cow service --------------------------
 const createCow = async (payload: ICow) => {
@@ -15,7 +19,7 @@ const createCow = async (payload: ICow) => {
 //-------get all Cows------------------------------------
 const getAllCows = async (
   filters: ICowFilters,
-  paginationOptions: IPaginationOptions
+  paginationOptions: IPaginationOptions,
 ): Promise<IGenericResponse<ICow[]>> => {
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(paginationOptions);
@@ -26,7 +30,7 @@ const getAllCows = async (
     filtersData,
     cowSearchableFields,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
   const result = await Cow.find(whereConditions)
@@ -53,9 +57,30 @@ const getSingleCow = async (id: string) => {
 
   return result;
 };
-
 //-------update a cow--------------------------
-const updateCow = async (id: string, payload: Partial<ICow>) => {
+const updateCow = async (
+  id: string,
+  user: JwtPayload | null,
+  payload: Partial<ICow>,
+) => {
+  if (!user || !user.phoneNumber) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const loggedInUser = await User.findOne({ phoneNumber: user.phoneNumber });
+  const cow = await Cow.findOne({ _id: id });
+
+  if (!loggedInUser || !cow) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User or Cow not found');
+  }
+
+  if (String(loggedInUser.seller) !== String(cow.seller)) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to update this Cow🐮',
+    );
+  }
+
   const result = await Cow.findByIdAndUpdate({ _id: id }, payload, {
     new: true,
   }).populate('seller');
@@ -63,7 +88,23 @@ const updateCow = async (id: string, payload: Partial<ICow>) => {
 };
 
 //-------delete a cow--------------------------
-const deleteCow = async (id: string) => {
+const deleteCow = async (id: string, user: JwtPayload | null) => {
+  if (!user || !user.phoneNumber) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+  }
+  const loggedInUser = await User.findOne({ phoneNumber: user.phoneNumber });
+  const cow = await Cow.findOne({ _id: id });
+
+  if (!loggedInUser || !cow) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User or Cow not found');
+  }
+  if (String(loggedInUser.seller) !== String(cow.seller)) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to delete this Cow',
+    );
+  }
+
   const result = await Cow.findByIdAndDelete(id).populate('seller');
   return result;
 };

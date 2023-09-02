@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 node_modules
 /dist
 .env
 yarn.lock
 .vercel
-=======
-node_modules
-/dist
-.env
-yarn.lock
-.vercel
->>>>>>> master

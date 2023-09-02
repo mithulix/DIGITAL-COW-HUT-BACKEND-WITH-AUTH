@@ -62,6 +62,22 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   await sendUserResponse(res, `User is Deleted successfully`, result);
 });
 
+//-----------my profile-----------------------------------------
+const myProfile = catchAsync(async (req: Request, res: Response) => {
+  const { user } = req;
+  const result = await UserService.myProfile(user);
+
+  sendUserResponse(res, 'User  information retrieved successfully ', result);
+});
+
+//-----------update user profile-----------------------------------------
+const updateUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const { user } = req;
+  const result = await UserService.updateUserProfile(user, req.body);
+  await sendUserResponse(res, `User is Updated successfully`, result);
+});
+
+
 export const UserController = {
   createSeller,
   createBuyer,
@@ -69,4 +85,6 @@ export const UserController = {
   getSingleUser,
   updateUser,
   deleteUser,
+  myProfile,
+  updateUserProfile
 };
