@@ -1,6 +1,6 @@
 ### WELCOME TO DIGITAL-COW-HUT-WITH-AUTH PROJECT.
 
-### LIVE PREVIEW -> https://digital-cow-hut-backend-jade.vercel.app/
+### LIVE PREVIEW -> https://digital-cow-hut-backend-with-auth-ten.vercel.app/
 
 ### Application Routes:
 
