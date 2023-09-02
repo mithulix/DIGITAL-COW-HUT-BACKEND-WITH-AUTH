@@ -54,5 +54,7 @@
     "winston": "^3.10.0",
     "winston-daily-rotate-file": "^4.7.1",
     "zod": "^3.21.4"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/mithulix/Digital-cow-hut-backend-with-Auth.git"
 }
