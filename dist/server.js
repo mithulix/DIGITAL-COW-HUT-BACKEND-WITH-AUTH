@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
 const envConfig_1 = __importDefault(require("./config/envConfig"));
-const port = envConfig_1.default.PORT;
+const port = envConfig_1.default.port;
 // Connect Database
 mongoose_1.default
-    .connect(envConfig_1.default.DATABASE_URL)
-    .then(() => console.log("😂 Database connected successfully"))
+    .connect(envConfig_1.default.database_url)
+    .then(() => console.log("😂 Database connected successfully...."))
     .catch((error) => console.log(`Unable to connect MongoDB: ${error}`));
 // Listen to Server
 const server = app_1.default.listen(port, () => {

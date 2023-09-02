@@ -7,18 +7,18 @@ const zod_1 = require("zod");
 const ApiError_1 = require("../../shared/errors/ApiError");
 const error_handlers_1 = require("../../shared/errors/error.handlers");
 const envConfig_1 = __importDefault(require("../../config/envConfig"));
-const globalErrorHandler = (error, req, res) => {
+const globalErrorHandler = (error, req, res, next) => {
     let statusCode = 500;
     const success = false;
-    let message = "Something went wrong!";
+    let message = 'Something went wrong!';
     let errorMessage = [];
-    if (error.name == "ValidationError") {
+    if (error.name == 'ValidationError') {
         const simplifiedError = error_handlers_1.ErrorHandler.handleValidationError(error);
         statusCode = simplifiedError.status;
         message = simplifiedError.message;
         errorMessage = simplifiedError.errorMessage;
     }
-    else if (error.name == "CastError") {
+    else if (error.name == 'CastError') {
         const simplifiedError = error_handlers_1.ErrorHandler.handleCastError(error);
         statusCode = simplifiedError.status;
         message = simplifiedError.message;
@@ -43,7 +43,8 @@ const globalErrorHandler = (error, req, res) => {
         success,
         message,
         errorMessage,
-        stack: envConfig_1.default.NODE_ENV == "development" ? error.stack : undefined,
+        stack: envConfig_1.default.env == 'development' ? error.stack : undefined,
     });
+    next();
 };
 exports.default = globalErrorHandler;
