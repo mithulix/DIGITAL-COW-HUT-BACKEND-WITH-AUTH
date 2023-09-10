@@ -35,7 +35,7 @@ const moduleRoutes = [
     path: '/admins',
     route: AdminRoutes,
   },
-  {
+  { 
     path: '/buyers',
     route: BuyerRoutes,
   },
